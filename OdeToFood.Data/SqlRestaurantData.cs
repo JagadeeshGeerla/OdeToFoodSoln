@@ -53,6 +53,11 @@ namespace OdeToFood.Data
             return query;
         }
 
+        public int GetRestaurantsCount()
+        {
+            return db.Restaurants.Count();
+        }
+
         public Restaurant Update(Restaurant restaurant)
         {
             var entity = db.Restaurants.Attach(restaurant);

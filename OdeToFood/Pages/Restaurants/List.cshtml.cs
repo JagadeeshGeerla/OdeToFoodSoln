@@ -12,6 +12,7 @@ namespace OdeToFood.Pages.Restaurants
 {
     public class ListModel : PageModel
     {
+        [TempData]
         public string Message { get; set; }
         public IEnumerable<Restaurant> Restaurants { get; set; }
 
@@ -30,7 +31,7 @@ namespace OdeToFood.Pages.Restaurants
         public void OnGet()
         {
             Restaurants = RestaurantData.GetRestaurantsByName(SearchTerm);
-            Message = Config["Message"];
+            //Message = Config["Message"];           
         }
     }
 }

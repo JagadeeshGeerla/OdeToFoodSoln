@@ -15,7 +15,7 @@ namespace OdeToFood.Pages.Restaurants
         private readonly IRestaurantData restaurantData;
         private readonly IHtmlHelper htmlHelper;
 
-       [BindProperty]
+        [BindProperty]
         public Restaurant Restaurant { get; set; }
         public IEnumerable<SelectListItem> Cuisines { get; set; }
 
@@ -24,24 +24,50 @@ namespace OdeToFood.Pages.Restaurants
             this.restaurantData = restaurantData;
             this.htmlHelper = htmlHelper;
         }
-        public IActionResult OnGet(int restaurantId)
+        public IActionResult OnGet(int? restaurantId)
         {
             Cuisines = htmlHelper.GetEnumSelectList<CuisineType>();
 
-            Restaurant = restaurantData.GetById(restaurantId);
-            if (Restaurant == null)
+            if (restaurantId.HasValue)
             {
-                return RedirectToPage("./NotFound");
+                Restaurant = restaurantData.GetById(restaurantId.Value);
+                
+                if (Restaurant == null)
+                {
+                    return RedirectToPage("./NotFound");
+                }
             }
+            else
+            {
+                Restaurant = new Restaurant();
+            }
+
+
             return Page();
         }
 
         public IActionResult OnPost()
         {
-            restaurantData.Update(Restaurant);
-            restaurantData.Commit();
+            if (!ModelState.IsValid)
+            {
+                Cuisines = htmlHelper.GetEnumSelectList<CuisineType>();
 
-            return Page();
+                return Page();
+            }
+
+            if (Restaurant.Id > 0)
+            {
+                restaurantData.Update(Restaurant);
+                TempData["Message"] = "Restaurant Updated!";
+            }
+            else
+            {
+                restaurantData.Add(Restaurant);
+                TempData["Message"] = "Restaurant Added!";
+            }
+            restaurantData.Commit();
+            return RedirectToPage("./Detail", new { restaurantId = Restaurant.Id });
+
         }
     }
 }
